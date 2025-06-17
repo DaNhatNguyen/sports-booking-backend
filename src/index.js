@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/authRoutes');
+const courtRoutes = require('./routes/courtRoutes');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 
 // Sử dụng router
 app.use('/api/auth', authRoutes);
+app.use('/api/courts', courtRoutes);
 
 // Connect DB & start server
 const PORT = process.env.PORT || 5000;
