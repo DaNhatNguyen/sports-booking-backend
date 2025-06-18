@@ -7,7 +7,7 @@ const courtSchema = new mongoose.Schema({
     trim: true,
   },
   type: {
-    type: String, // vd: "Cầu lông", "Bóng đá"
+    type: String,
     required: true,
   },
   address: {
@@ -17,33 +17,22 @@ const courtSchema = new mongoose.Schema({
   phoneNumber: {
     type: String,
   },
-  images: [String], // danh sách link ảnh
+  images: [String],
   price: {
     type: Number,
     required: true,
   },
   subCourtCount: {
     type: Number,
-    required: true, // số lượng sân nhỏ
+    required: true,
   },
   openTime: {
-    type: String, // ví dụ: "06:00"
+    type: String,
     required: true,
   },
   closeTime: {
-    type: String, // ví dụ: "22:00"
+    type: String,
     required: true,
-  },
-  location: {
-    type: {
-      type: String,
-      enum: ['Point'],
-      default: 'Point',
-    },
-    coordinates: {
-      type: [Number], // [lng, lat]
-      required: true,
-    },
   },
   rating: {
     type: Number,
