@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/authRoutes');
 const courtRoutes = require('./routes/courtRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -15,6 +16,7 @@ app.use(express.json());
 // Sử dụng router
 app.use('/api/auth', authRoutes);
 app.use('/api/courts', courtRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 // Connect DB & start server
 const PORT = process.env.PORT || 5000;
