@@ -1,25 +1,21 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const authRoutes = require('./routes/authRoutes');
-const courtRoutes = require('./routes/courtRoutes');
-const bookingRoutes = require('./routes/bookingRoutes');
-const cors = require('cors');
+const connectDB = require('./config/db');
+const applyMiddleware = require('./middlewares/globalMiddleware');
+const routes = require('./routes'); // <- Chỉ cần import một file
 require('dotenv').config();
 
 const app = express();
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true
-}));
-app.use(express.json());
 
-// Sử dụng router
-app.use('/api/auth', authRoutes);
-app.use('/api/courts', courtRoutes);
-app.use('/api/bookings', bookingRoutes);
+// Middleware
+applyMiddleware(app);
 
-// Connect DB & start server
+// Sử dụng tất cả các route
+app.use('/api', routes);
+
+// Khởi động server
 const PORT = process.env.PORT || 5000;
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => app.listen(PORT, () => console.log(`Server running on port ${PORT}`)))
-  .catch(err => console.error(err));
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+});

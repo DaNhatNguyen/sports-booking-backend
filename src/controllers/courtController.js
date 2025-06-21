@@ -1,7 +1,9 @@
+const Court = require('../models/Court');
 const CourtGroup = require('../models/CourtGroup');
 const Booking = require('../models/Booking');
 const TimeSlot = require('../models/TimeSlot');
 
+// Lấy ra sân lớn theo khu vực
 const getNearbyCourtGroups = async (req, res) => {
   try {
     const { province, district } = req.query;
@@ -27,11 +29,34 @@ const getNearbyCourtGroups = async (req, res) => {
   }
 };
 
+// Lấy ra sân lớn theo id
+const getCourtGroupById = async (req, res) => {
+  try {
+    const { groupId } = req.params;
+
+    if (!groupId) {
+      return res.status(400).json({ message: 'Thiếu groupId trong URL.' });
+    }
+
+    const courtGroup = await CourtGroup.findById(groupId);
+    // console.log(courtGroup);
+
+    if (!courtGroup) {
+      return res.status(404).json({ message: 'Không tìm thấy sân.' });
+    }
+
+    return res.status(200).json(courtGroup);
+  } catch (error) {
+    console.error('Lỗi khi lấy sân lớn theo ID:', error);
+    return res.status(500).json({ message: 'Lỗi server.' });
+  }
+};
+
 // Tìm kiếm sân
 const searchCourtGroups = async (req, res) => {
   try {
     const { type, city, district } = req.query;
-    console.log(req.query);
+    // console.log(req.query);
 
     const query = {};
 
@@ -71,7 +96,6 @@ const getCourtGroupsByFilter = async (req, res) => {
   try {
     const { type, city, district } = req.query;
 
-    // Nếu cần ánh xạ slug → tên môn thể thao chuẩn (tuỳ frontend gửi)
     const typeMap = {
       'bong-da': 'Sân bóng đá',
       'cau-long': 'Sân cầu lông',
@@ -81,7 +105,6 @@ const getCourtGroupsByFilter = async (req, res) => {
 
     const query = {};
 
-    // Lọc theo loại sân (đã map sang chuẩn database)
     if (type) {
       const mapped = typeMap[type] || type;
       query.type = { $regex: `^${mapped}$`, $options: 'i' };
@@ -118,7 +141,7 @@ const getAvailableTimeSlots = async (req, res) => {
   try {
     const { courtId } = req.params;
     const { date } = req.query;
-    console.log(courtId)
+    // console.log(courtId)
 
     if (!courtId || !date) {
       return res.status(400).json({ message: 'Thiếu courtId hoặc date' });
@@ -133,7 +156,7 @@ const getAvailableTimeSlots = async (req, res) => {
       date,
       status: { $ne: 'cancelled' }
     });
-    console.log(bookings)
+    // console.log(bookings)
 
     const bookedStartTimes = bookings.map(b => b.timeSlot.startTime);
 
@@ -166,4 +189,7 @@ const getCourtsByGroupId = async (req, res) => {
   }
 };
 
-module.exports = { getCourtsByGroupId, getAvailableTimeSlots, getNearbyCourtGroups, searchCourtGroups, getCourtGroupsByFilter };
+module.exports = {
+  getCourtsByGroupId, getAvailableTimeSlots, getNearbyCourtGroups,
+  searchCourtGroups, getCourtGroupsByFilter, getCourtGroupById
+};
