@@ -44,4 +44,34 @@ const createBooking = async (req, res) => {
   }
 };
 
-module.exports = { createBooking };
+// Lấy lịch sử đặt sân của người dùng
+const getBookingsByUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const bookings = await Booking.find({ userId })
+      .sort({ createdAt: -1 }) // sắp xếp mới -> cũ
+      .populate({
+        path: 'courtId',
+        populate: { path: 'groupId' } // lấy cả thông tin sân lớn
+      });
+
+    // Format lại dữ liệu cho FE
+    const formatted = bookings.map(b => ({
+      _id: b._id,
+      date: b.date,
+      timeSlot: b.timeSlot,
+      status: b.status,
+      courtName: b.courtId?.name || '---',
+      courtGroupName: b.courtId?.groupId?.name || '---',
+      address: `${b.courtId?.groupId?.address || ''}, ${b.courtId?.groupId?.district || ''}, ${b.courtId?.groupId?.province || ''}`
+    }));
+
+    res.status(200).json(formatted);
+  } catch (error) {
+    console.error('Lỗi khi lấy lịch của user:', error);
+    res.status(500).json({ message: 'Lỗi server' });
+  }
+};
+
+module.exports = { createBooking, getBookingsByUser };
